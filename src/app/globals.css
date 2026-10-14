@@ -1,26 +1,410 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------------------
+ * Design tokens — Lamis Studio: Minimalist Luxury, tông kem – be – trắng – đen (theo brief).
+ * Đổi màu/font tại đây; mọi class fog-*, ink-*, ash-*, accent sẽ tự cập nhật.
+ * ------------------------------------------------------------------------- */
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-script: var(--font-script), cursive;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* nền kem (lấy từ nền logo gốc) — giữ tên "fog" của khung giao diện */
+  --color-fog: #f3efe6;
+  --color-fog-50: #faf8f3;
+  --color-fog-100: #ebe5d9;
+  --color-fog-200: #ddd4c4;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* be / cát (viền, chữ phụ) */
+  --color-ash-300: #c9bba5;
+  --color-ash-400: #a8997f;
+  --color-ash-500: #7d715f;
+
+  /* mực (chữ chính, nền tối) */
+  --color-ink: #141210;
+  --color-ink-soft: #4f4a43;
+  --color-ink-muted: #8c857a;
+  --color-graphite: #23201c;
+
+  /* điểm nhấn: be champagne, dùng tiết chế */
+  --color-accent: #b39b7d;
+  --color-accent-light: #e4d8c6;
+
+  --shadow-soft: 0 24px 60px -24px rgb(20 18 16 / 0.22);
+  --shadow-card: 0 10px 30px -12px rgb(20 18 16 / 0.16);
+  --shadow-polaroid: 0 18px 40px -18px rgb(20 18 16 / 0.35);
+
+  --tracking-eyebrow: 0.28em;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-kenburns: kenburns 9s ease-out forwards;
+  /* cột ảnh trôi dọc chậm (hero trang Bộ sưu tập): lên / xuống so le */
+  --animate-drift-up: drift-up 40s ease-in-out infinite alternate;
+  --animate-drift-down: drift-down 40s ease-in-out infinite alternate;
+
+  @keyframes drift-up {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-22%);
+    }
+  }
+  @keyframes drift-down {
+    from {
+      transform: translateY(-22%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes kenburns {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.08);
+    }
   }
 }
 
+/* "Một màn hình" = chiều cao viewport nhưng tối đa 1080px */
+html {
+  -webkit-text-size-adjust: 100%;
+  --screen: min(100svh, 1080px);
+}
+
+/* Chặn tràn ngang; dùng clip (không phải hidden) để position: sticky vẫn chạy */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  @apply bg-fog font-sans text-ink antialiased;
+}
+
+::selection {
+  background: #e4d8c6;
+  color: #141210;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Typography helpers ---------- */
+@utility eyebrow {
+  @apply text-[11px] font-medium tracking-eyebrow text-accent uppercase;
+}
+@utility h-display {
+  @apply font-serif leading-[1.04] font-medium tracking-[-0.01em] text-ink;
+}
+@utility polaroid {
+  @apply bg-white p-2 pb-7 shadow-polaroid;
+}
+@utility field {
+  @apply w-full rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink transition outline-none placeholder:text-ink-muted focus:border-ink/40 focus:ring-2 focus:ring-ink/10;
+}
+@utility panel {
+  @apply rounded-[2rem] sm:rounded-[2.5rem];
+}
+/* chỉ ép "một màn hình" từ lg; mobile/tablet co theo nội dung */
+@utility screen {
+  @media (min-width: 1024px) {
+    min-height: var(--screen);
+  }
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Section ghim: chỉ ghim khi viewport ≤ 1080px cao ---------- */
+.pin-only {
+  display: none;
+}
+@media (min-width: 1024px) and (max-height: 1080px) {
+  .pin-only {
+    display: block;
+  }
+  .stack-only {
+    display: none !important;
+  }
+}
+
+/* ---------- Reveal on scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  filter: blur(6px);
+  transition:
+    opacity 1s var(--ease-out-expo),
+    transform 1s var(--ease-out-expo),
+    filter 1s var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+.reveal[data-reveal="left"] {
+  transform: translateX(-32px);
+}
+.reveal[data-reveal="right"] {
+  transform: translateX(32px);
+}
+.reveal[data-reveal="scale"] {
+  transform: scale(0.94);
+}
+.reveal[data-reveal="clip"] {
+  transform: none;
+  filter: none;
+  opacity: 1;
+  clip-path: inset(12% 6% 12% 6% round 2rem);
+  transition: clip-path 1.2s var(--ease-out-expo);
+}
+.reveal[data-reveal="clip"].is-visible {
+  clip-path: inset(0 0 0 0 round 0);
+}
+
+/* ---------- SplitText: hiện từng từ / ký tự kiểu blur-in ---------- */
+.split .split-unit {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(0.35em);
+  transition:
+    opacity 0.7s var(--ease-out-expo),
+    filter 0.7s var(--ease-out-expo),
+    transform 0.7s var(--ease-out-expo);
+  transition-delay: calc(var(--base, 0ms) + var(--i, 0) * var(--step, 45ms));
+}
+.split.is-visible .split-unit {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+@keyframes loadbar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+/* Mở màn hero: ảnh hiện dần từ mờ + thu nhẹ về 100% */
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.hero-panel {
+  animation: heroIn 1.8s var(--ease-out-expo) both;
+  transform-origin: center;
+}
+
+/* ---------- Marquee ---------- */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 70s) linear infinite;
+}
+.marquee-track.reverse {
+  animation-direction: reverse;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- Scrollbar nhẹ ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9bba5;
+  border-radius: 10px;
+  border: 2px solid #f3efe6;
+}
+::-webkit-scrollbar-track {
+  background: #f3efe6;
+}
+
+/* Cormorant mặc định dùng số kiểu "old-style" (thấp, lệch dòng: 08 trông như "o8") → nhìn như lỗi font.
+   Bật số thẳng hàng cho mọi chữ serif. */
+.font-serif,
+.h-display {
+  font-variant-numeric: lining-nums;
+}
+
+/* ---------- Chữ nổi trên ảnh (không cần khung/nền) ----------
+   Bóng nhiều lớp: lớp sát (viền sắc) + lớp toả rộng, mềm (tách chữ khỏi ảnh). Nhìn không thấy "bóng",
+   chỉ thấy chữ rõ hơn. text-shadow kế thừa xuống con → áp 1 lần ở thẻ cha là đủ (kể cả SplitText). */
+@utility text-legible {
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.55),
+    0 2px 12px rgb(0 0 0 / 0.45);
+}
+@utility text-legible-lg {
+  text-shadow:
+    0 1px 1px rgb(0 0 0 / 0.35),
+    0 2px 6px rgb(0 0 0 / 0.3),
+    0 8px 40px rgb(0 0 0 / 0.55);
+}
+
+/* ---------- Giới hạn chiều ngang cho khối tràn viền ----------
+   Zoom trình duyệt nhỏ (67%, 50%) = khung nhìn rộng hơn (2880px, 3840px). Chiều cao section đã kẹp ở
+   --screen (≤1080px) nhưng ảnh/dải ảnh tràn viền vẫn giãn ngang → ảnh dọc bị cắt thành ảnh ngang, dải ảnh hở.
+   bleed-cap: kẹp tối đa 1920px & căn giữa (giữ bố cục như ở 100%); rộng hơn 1920px thì 2 mép mờ dần vào nền.
+   bleed-box: chỉ kẹp, không mờ mép (cho phần tử nổi như polaroid). Dùng được cho cả phần tử absolute inset-0. */
+@utility bleed-cap {
+  margin-inline: auto;
+  max-width: 1920px;
+  @media (min-width: 1921px) {
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+}
+@utility bleed-box {
+  margin-inline: auto;
+  max-width: 1920px;
+}
+
+/* ---------- Chống rớt chữ (chữ mồ côi) ----------
+   Tiêu đề (ngắn, 1–3 dòng): balance — chia các dòng dài đều nhau, không còn 1 chữ lẻ ở dòng cuối.
+   Đoạn văn: pretty — trình duyệt chỉ chỉnh vài dòng cuối để tránh chữ lẻ, phần trên giữ nguyên.
+   Đặt trong @layer base để class Tailwind (whitespace-nowrap, text-balance…) vẫn thắng khi cần. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  .h-display,
+  figcaption {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote,
+  dd {
+    text-wrap: pretty;
+  }
+}
+
+/* ---------- Chuyển trang (PageTransition) ----------
+   Rời trang: nội dung mờ dần + trôi nhẹ lên; vào trang mới: hiện lên từ dưới. Nền giữa 2 trang là màu body
+   (xám sương), không chớp trắng. Chỉ có transform trong lúc chuyển → không ảnh hưởng sticky/fixed bên trong. */
+main {
+  transition:
+    opacity 0.2s var(--ease-out-expo),
+    transform 0.2s var(--ease-out-expo);
+}
+main.page-leave {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+main.page-enter {
+  animation: pageIn 0.45s var(--ease-out-expo) both;
+}
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  main.page-leave,
+  main.page-enter {
+    transform: none;
+  }
 }

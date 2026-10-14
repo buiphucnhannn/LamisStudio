@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+﻿# Lamis Studio — Website
 
-## Getting Started
+Website studio chụp ảnh & makeup **Lamis Studio** (TP. Vinh, Nghệ An), song ngữ Việt / Anh.
+Khung giao diện dùng lại 100% từ dự án ButStudio (bố cục, khoảng cách, hiệu ứng); nội dung, hình ảnh và
+bảng màu (kem – be – trắng – đen) theo hồ sơ yêu cầu `docs/demo.docx`.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · Tailwind CSS v4 · JavaScript thuần · Lenis (cuộn mượt)
+
+## Chạy dự án
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # đặt NEXT_PUBLIC_SITE_URL = tên miền thật
+npm run dev                  # http://localhost:3000  (tiếng Anh: /en)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Lệnh             | Mô tả                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| `npm run dev`    | Môi trường phát triển                                                   |
+| `npm run build`  | Build production                                                        |
+| `npm run lint`   | Kiểm tra code                                                           |
+| `npm run format` | Định dạng code (Prettier + sắp xếp class Tailwind)                      |
+| `npm run assets` | Sinh lại logo tách nền, favicon, icon từ `public/images/brand/logo.jpg` |
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Trang
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Trang chủ** `/` — Hero → Dải chữ chạy → Về Lamis → Album concept → Dịch vụ → Quy trình →
+  Bảng giá tham khảo (`#pricing`) → Portfolio → Makeup Academy → Đánh giá khách hàng → Liên hệ.
+- **Album** `/bo-suu-tap` — 6 album, lọc theo thể loại & phong cách; chi tiết `/bo-suu-tap/<slug>`.
+- **Dịch vụ** `/dich-vu` — 6 dịch vụ kèm giá tham khảo, hành trình 4 bước, bảng giá, FAQ.
+- Bản tiếng Anh: `/en`, `/en/collections`, `/en/services`.
+- **Đặt lịch:** popup dùng chung — mọi phần tử có `data-booking` khi bấm sẽ mở popup
+  (giá trị = slug album để chọn sẵn concept).
+- Footer có Google Maps; nút nổi Messenger / Zalo / Gọi.
 
-## Learn More
+## Chỉnh nội dung
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Mọi chữ, giá, ảnh:** `src/data/site.js` (song ngữ dạng `t("tiếng Việt", "English")`).
+- **Thông tin liên hệ, giờ mở cửa, bản đồ, SEO:** `src/config/site.js`.
+- Mục ghi `CẦN XÁC NHẬN` là nội dung mẫu cần hỏi lại khách: địa chỉ chi tiết / link Google Maps,
+  giờ mở cửa, bảng giá, đánh giá khách hàng, link Instagram.
+- **Ảnh:** `public/images/<album>/<album>-NN.(jpg|webp)`; ảnh webp khai báo trong `WEBP` ở đầu `site.js`.
+- **Thêm album:** thêm vào `collections` (site.js) + 1 dòng slug tiếng Anh trong `src/i18n/routes.js`.
+- **Màu:** khối `@theme` trong `src/app/globals.css` (tên class `fog/ash/ink/accent` giữ như khung gốc,
+  giá trị đã đổi sang tông kem – be).
